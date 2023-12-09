@@ -94,11 +94,11 @@ int main() {
     for (int i = 0; i < n; i++) {
         insertLast();
     }
-    print();
+    //print();
     int a, b;
     cin >> a >> b;
     reverseLinkedList();
-    print();
+    //print();
     swapNodes(a, b);
     print();
 
