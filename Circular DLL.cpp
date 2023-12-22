@@ -1,4 +1,4 @@
-/*Doubly Linked List */
+/*Circular Doubly Linked List */
 #include<iostream>
 using namespace std;
 struct Node
@@ -17,18 +17,33 @@ void insertAtBeginning()
     newNode->data = value;
     newNode->prev = NULL;
     newNode->next = NULL;
-    if(head != NULL){//update the head->prev only when list is already created
-       newNode->next=head;
-       head->prev = newNode;
+    if(head==NULL)//List is Empty so create List
+    {
+        tail = newNode;
+        head = newNode;
+        head->prev = tail;
+        tail->next = head;
     }
-    head = newNode;
+    else
+    {
+        newNode->next=head;
+        newNode->prev=tail;
+        head->prev=newNode;
+        head=newNode;
+        tail->next=head;
+    }
 }
 void insertAtMiddle()
 {
-    int value;
-    cin>>value;
     int pos;
     cin>>pos;
+    if(pos==1)
+    {
+        insertAtBeginning();
+        return;
+    }
+    int value;
+    cin>>value;
     Node *newNode = new Node();
     newNode->data = value;
     newNode->prev = NULL;
@@ -44,6 +59,10 @@ void insertAtMiddle()
     newNode->prev = prevNode;
     newNode->next = temp;
     temp->prev = newNode;
+    if(temp==head && prevNode==tail)
+    {
+        tail=newNode;
+    }
 }
 void insertAtEnd()
 {
@@ -53,51 +72,65 @@ void insertAtEnd()
     newNode->data = value;
     newNode->prev = NULL;
     newNode->next = NULL;
-    if(head==NULL)//List is empty so create the list
+    if(head==NULL)
+    {
+        tail=newNode;
         head = newNode;
+        head->prev = tail;
+        tail->next = head;
+    }
     else
     {
-        Node *temp = head;
-        while(temp->next!=NULL)
-        {
-            temp=temp->next;
-        }
-        temp->next=newNode;
-        newNode->prev=temp;
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail=newNode;
+        head->prev = tail;
+        tail->next = head;
     }
 }
 void deleteFirst()
 {
-    if(head == NULL){
-        cout<<"List is Empty\n";
+    if(head == NULL)
+    {
+        cout<<"List is Empty, can't Delete\n";
     }
-    else{
-        Node *temp=head;
-        head=head->next;
-        head->prev=NULL;
-        delete temp;
+    else
+    {
+        if(head==tail)//Single Node to be deleted, then List becomes empty
+        {
+            delete head;
+            head=NULL;
+            tail=NULL;
+        }
+        else
+        {
+            Node *temp=head;
+            head=head->next;
+            tail->next=head;
+            head->prev=tail;
+            delete temp;
+        }
     }
 }
 void deleteEnd()
 {
     if(head == NULL)
     {
-        cout<<"List is Empty\n";
+        cout<<"List is Empty, Can't Delete\n";
     }
-    else if(head->next==NULL)//Single node to be deleted,List becomes empty
+    else if(head==tail)//Single node to be deleted,List becomes empty
     {
         delete(head);
-        head = NULL;
+        head=NULL;
+        tail=NULL;
     }
     else
     {
-        Node *temp=head;
-        while (temp->next->next != NULL)
-        {
-            temp = temp->next;
-        }
-        delete(temp->next);
-        temp->next = NULL;
+        Node *temp=tail;
+        tail=tail->prev;
+        tail->next=head;
+        head->prev=tail;
+        delete(temp);
     }
 }
 void deleteMiddle()
@@ -113,30 +146,40 @@ void deleteMiddle()
     }
     prevNode->next=temp->next;
     temp->next->prev=prevNode;
+    if(temp==tail)
+    {
+        tail=prevNode;
+    }
     delete(temp);
 }
 void printforward()
 {
+    if( head==NULL && tail==NULL)
+    {
+        cout<<"List is Empty"<<endl;
+        return;
+    }
     Node *temp = head;
-    while(temp!=NULL)
+    do
     {
         cout<<temp->data<<" ";
         temp=temp->next;
-    }
+    }while(temp!=head);
     cout<<endl;
 }
 void printbackward()
 {
-    Node *temp = head;
-    while(temp->next!=NULL)
+    if( head==NULL && tail==NULL)
     {
-        temp=temp->next;
+        cout<<"List is Empty"<<endl;
+        return;
     }
-    while(temp!=NULL)
+    Node *temp = tail;
+    do
     {
         cout<<temp->data<<" ";
         temp=temp->prev;
-    }
+    }while(temp!=tail);
     cout<<endl;
 }
 int main()
@@ -146,26 +189,50 @@ int main()
     for(int i=1;i<=n;i++)
     {
         insertAtBeginning();
-        printforward();
     }
+    printforward();
     insertAtMiddle();
     printforward();
     insertAtMiddle();
     printforward();
-    int count;
-    cin>>count;
-    for(int i=1;i<=count;i++)
-    {
-        deleteEnd();
-        printforward();
-    }
-    deleteMiddle();
+    insertAtEnd();
     printforward();
-    deleteMiddle();
+    insertAtEnd();
     printforward();
-    cout<<"Doubly linked list forwards: ";
+    
+    cout<<"Circular Doubly linked list forwards: ";
     printforward();
-    cout<<"Doubly linked list backwards: ";
+    cout<<"Circular Doubly linked list backwards: ";
     printbackward();
+    
+    deleteMiddle();
+    printforward();
+    deleteMiddle();
+    printforward();
+    deleteFirst();
+    printforward();
+    deleteFirst();
+    printforward();
+    deleteEnd();
+    printforward();
+    deleteEnd();
+    printforward();
+    deleteEnd();
+    printforward();
+    deleteFirst();
+    printforward();
+    deleteFirst();
+    printforward();
+
     return 0;
 }
+/*INPUT
+4
+10 20 30 40
+2 50
+5 60
+70
+80
+3
+5
+*/
